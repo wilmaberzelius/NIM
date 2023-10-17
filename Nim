@@ -1,0 +1,44 @@
+static bool GameRules(){
+        Console.WriteLine("Hej och välkommen till NIM! Ifall du vill starta spelet tryck ENTER");
+        ConsoleKeyInfo keyInfo = Console.ReadKey();
+
+        if (keyInfo.Key == ConsoleKey.Enter){
+            Console.WriteLine ("Spelet har startat! Här kommer lite regler, tryck enter för att få fram nästa regel; ");
+            Console.ReadLine();
+            Console.WriteLine ("Spelet börjar med att femton stickor delas upp i tre lika stora högar om fem");
+            Console.ReadLine();
+            Console.WriteLine ("Därefter turas spelarna om att dra stickor från högarna, du får bara stickor från en hög åt gången. Du måste ta minst en sticka. ");
+            Console.ReadLine();
+            // en rad om hur man plockar stickor
+            Console.WriteLine("Spelaren som tar sista stickan vinner! Lycka till!");
+            return true;
+        }
+        else Console.WriteLine("/n Vi ses en annan gång");
+        return false;
+        
+    }
+
+    static string WhatsYourName(){
+        string spelare1 = string.Empty;
+        string spelare2 = string.Empty;
+        
+        Console.WriteLine("1 eller 2 spelare? Skriv '1' eller '2'");
+        int.TryParse(Console.ReadLine(), out int total);
+        if (total < 1 || total >  2){
+            Console.WriteLine("För många spelare");
+            return WhatsYourName();
+        }
+
+        else if (total == 1){
+            Console.WriteLine("Vad är ditt namn?");
+            spelare1 += Console.ReadLine();
+            return spelare1;
+        }
+        
+        else Console.WriteLine("Vad är ditt namn spelare ett?");
+        spelare1 += Console.ReadLine();
+        Console.WriteLine("Vad är ditt namn spelare två?");
+        spelare2 += Console.ReadLine();
+        return spelare1 + spelare2;
+
+    }
