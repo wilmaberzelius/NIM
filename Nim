@@ -42,3 +42,27 @@ static bool GameRules(){
         return spelare1 + spelare2;
 
     }
+
+        static void StartSticks (){
+        int [] sticks = {5, 5, 5};
+        for (int i = 0; i < sticks.Length; i++){
+            for (int j = 1; j <= i; j++){
+                Console.WriteLine('|');
+            }
+        }
+
+
+ static int WhosTurn(int x){
+  string spelare1namn = WhatsYourName();
+  string spelare2namn = WhatsYourName();
+        
+        if (x % 2 != 0){
+            Console.WriteLine(spelare1namn + " tur");
+            return 1;
+        }
+        else Console.WriteLine(spelare2namn + " tur");
+        return 2;
+    }
+
+
+
