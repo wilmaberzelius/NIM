@@ -1,0 +1,521 @@
+//August Bäckman, Malte Fjällström och William Lagerqvist
+//22:a Oktober 2022
+//Visual Studio 2019 (Version 8.10.25.2)
+using System;
+using System.Collections.Generic;
+
+namespace Projektgrupp11_Nim
+{
+    class Program
+    {
+        /// <summary>
+        /// Nim
+        /// </summary>
+        /// <param name="args"></param>
+        static void Main(string[] args)
+        {
+
+            int kor_program = 1;
+            int vinst_spelare1 = 0;
+            int vinst_spelare2 = 0;
+
+            //Hälsar spelarna välkomna och skriver ut spelreglerna
+            valkommen();
+
+            //Programmeny
+            while (kor_program != 0)
+            {
+                //Felhantering av menyval
+                bool korrektInput = false;
+                while (!korrektInput)
+                {
+                    //Menyval
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("\nVälj i menyn nedan:");
+                    Console.WriteLine("1. Spela en omgång Nim mot en vän.");
+                    Console.WriteLine("2. Spela en omgång Nim mot datorn.");
+                    Console.WriteLine("0. Avsluta programmet.\n");
+
+                    if(int.TryParse(Console.ReadLine(), out kor_program))
+                    {
+                        if (kor_program == 0 || kor_program == 1 || kor_program == 2)
+                        {
+                            korrektInput = true;
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("\nDu måste ange ett heltal mellan 0 och 2, vänligen försök igen.\n");
+                        }
+                    }
+
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("\nDu måste ange ett heltal mellan 0 och 2, vänligen försök igen.\n");
+                    }
+
+                }
+
+                switch (kor_program)
+                {
+                    //Spela mot en vän
+                    case 1:
+
+                        string spelare1, spelare2;
+                        vinst_spelare1 = 0;
+                        vinst_spelare2 = 0;
+
+                        //Läser in namnet på spelare 1
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write("\nAnge namnet på spelare 1: ");
+                        spelare1 = lasInNamn();
+
+                        //Läser in namnet på spelare 2
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("Ange namnet på spelare 2: ");
+                        spelare2 = lasInNamn();
+
+                        int spela = 1;
+                        while (spela != 0)
+                        {
+                            //Felhantering av sub-menyval
+                            korrektInput = false;
+                            while(!korrektInput)
+                            {
+                                //Sub-menyval
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                                Console.WriteLine("\n");
+                                Console.WriteLine("1. Starta ett nytt parti");
+                                Console.WriteLine("0. Gå tillbaka till huvudmenyn\n");
+
+                                //Felhantering
+                                if (int.TryParse(Console.ReadLine(), out spela))
+                                {
+                                    if (spela == 0 || spela == 1)
+                                    {
+                                        korrektInput = true;
+                                    }
+                                    else
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.WriteLine("\nDu måste ange heltalet 0 eller 1, vänligen försök igen.");
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("\nDu måste ange heltalet 0 eller 1, vänligen försök igen.");
+                                }
+                            }
+
+                            switch (spela)
+                            {
+                                //Spela ett parti Nim
+                                case 1:
+
+                                    int antalDrag = 0;
+                                    int[] stickArray = new int[] { 5, 5, 5 };
+
+                                    //Metoder som endast utförs om det finns stickor kvar i högarna
+                                    do
+                                    {
+                                        //Skriver ut vems tur det är att göra ett drag
+                                        skrivUtVemsDrag(ref antalDrag, spelare1, spelare2);
+
+                                        //Läser in ett drag från en spelare och beräknar den nya ordningen av högarna med stickor
+                                        hanteraDrag(ref antalDrag, stickArray);
+
+                                        //Skriver ut ordningen av högarna med stickor
+                                        skrivUtStickor(stickArray);
+                                    }
+                                    while (stickorKvar(stickArray));
+
+
+                                    //Skriver ut vinnaren av partiet
+                                    if (antalDrag % 2 == 0)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Yellow;
+                                        Console.WriteLine("\n" + spelare2 + " är vinnaren!\n");
+                                        vinst_spelare2++;
+                                    }
+                                    else
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Blue;
+                                        Console.WriteLine("\n" + spelare1 + " är vinnaren!\n");
+                                        vinst_spelare1++;
+                                    }
+
+                                    //Skriver ut vinststatistik över spelade partier
+                                    Console.ForegroundColor = ConsoleColor.Magenta;
+                                    Console.WriteLine("Tack för att ni har spelat!\nStällningen är nu: ");
+
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine(spelare1 + ": " + vinst_spelare1);
+
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine(spelare2 + ": " + vinst_spelare2);
+                                    break;
+                            }
+                        }
+
+                        break;
+
+                    //Spela mot datorn
+                    case 2:
+
+                        string spelare1_ai, spelare2_ai;
+                        vinst_spelare1 = 0;
+                        vinst_spelare2 = 0;
+
+                        //Läser in namnet på spelaren
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write("\nAnge ditt namn: ");
+                        spelare2_ai = lasInNamn();
+                        spelare1_ai = "Datorn";
+
+                        int spela_ai = 1;
+                        while (spela_ai != 0)
+                        {
+                            //Felhantering av sub-menyval
+                            korrektInput = false;
+                            while (!korrektInput)
+                            {
+                                //Sub-menyval
+                                Console.ForegroundColor = ConsoleColor.Magenta;
+                                Console.WriteLine("\n");
+                                Console.WriteLine("1. Starta ett nytt parti");
+                                Console.WriteLine("0. Gå tillbaka till huvudmenyn\n");
+
+                                //Felhantering
+                                if (int.TryParse(Console.ReadLine(), out spela_ai))
+                                {
+                                    if (spela_ai == 0 || spela_ai == 1)
+                                    {
+                                        korrektInput = true;
+                                    }
+                                    else
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.WriteLine("\nDu måste ange heltalet 0 eller 1, vänligen försök igen.");
+                                    }
+                                }
+
+                                else
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("\nDu måste ange heltalet 0 eller 1, vänligen försök igen.");
+                                }
+                            }
+
+                            switch (spela_ai)
+                            {
+                                //Spela ett parti Nim
+                                case 1:
+                                    int antalDrag_ai = 0;
+                                    int[] stickArray_ai = new int[] { 5, 5, 5 };
+
+                                    //Metoder som endast utförs om det finns stickor kvar i högarna
+                                    do
+                                    {
+                                        //Skriver ut vems tur det är att göra ett drag
+                                        skrivUtVemsDrag(ref antalDrag_ai, spelare1_ai, spelare2_ai);
+
+                                        if (antalDrag_ai % 2 != 0)
+                                        {
+                                            //Läser in ett drag från en spelare och beräknar den nya ordningen av högarna med stickor
+                                            hanteraDrag(ref antalDrag_ai, stickArray_ai);
+                                        }
+                                        else
+                                        {
+                                            //AI gör sitt drag och den nya ordningen av högar med stickor beräknas
+                                            hanteraDrag_ai(ref antalDrag_ai, stickArray_ai);
+                                        }
+                                        //Skriver ut ordningen av högarna med stickor
+                                        skrivUtStickor(stickArray_ai);
+                                    }
+                                    while (stickorKvar(stickArray_ai));
+
+                                    //Skriver ut vinnst eller förlust
+                                    if (antalDrag_ai % 2 == 0)
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Green;
+                                        Console.WriteLine("\nVinnst!!!\n");
+                                        vinst_spelare2++;
+                                    }
+                                    else
+                                    {
+                                        Console.ForegroundColor = ConsoleColor.Red;
+                                        Console.WriteLine("\nFörlust :(\n");
+                                        vinst_spelare1++;
+                                    }
+                                    //Skriver ut vinststatistik över spelade partier
+                                    Console.ForegroundColor = ConsoleColor.Magenta;
+                                    Console.WriteLine("Tack för att du har spelat!\nStällningen är nu: ");
+
+                                    Console.ForegroundColor = ConsoleColor.Blue;
+                                    Console.WriteLine(spelare1_ai + ": " + vinst_spelare1);
+
+                                    Console.ForegroundColor = ConsoleColor.Yellow;
+                                    Console.WriteLine(spelare2_ai + ": " + vinst_spelare2);
+
+                                    break;
+                            }
+                        }
+
+                    break;
+
+                }
+            }
+
+        }
+
+        //------------------------------------------------------
+        //Metoder
+        //------------------------------------------------------
+
+
+        /// <summary>
+        /// Hälsar spelarna välkomna och skriver ut spelreglerna
+        /// </summary>
+        static void valkommen()
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Välkommen till Nim!");
+            Console.WriteLine("Spelet börjar med att man placerar fem stickor i tre olika högar:\n");
+            Console.WriteLine("|||||\n|||||\n|||||\n");
+            Console.WriteLine("Därefter turas spelarna om att plocka stickor från dem tills de är tomma.");
+            Console.WriteLine("Man får plocka så många stickor man vill, men inte 0 och man får endast plocka från en hög åt gången.");
+            Console.WriteLine("Den spelare som har plockat den sista stickan har vunnit spelet.");
+        }
+
+        /// <summary>
+        /// Läser in namn på en spelare
+        /// </summary>
+        /// <returns>Namnet på spelaren</returns>
+        static string lasInNamn()
+        {
+            string namn = "";
+            bool korrektInput = false;
+
+            while(!korrektInput)
+            {
+                namn = Console.ReadLine();
+
+                //Felhantering
+                if (namn.Length == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Du har inte skrivit något namn, vänligen försök igen:");
+                }
+                else if(namn.Length > 20)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("För långt namn, vänligen ange ett namn under 20 tecken:");
+                }
+                else
+                {
+                    korrektInput = true;
+                }
+            }
+
+            return namn;
+        }
+
+        /// <summary>
+        /// Beräknar och skriver sedan ut vems tur det är att göra sitt drag
+        /// </summary>
+        /// <param name="antalDrag">Siffra som används för att beräkna vems tur det är</param>
+        /// <param name="spelare1">Skriver ut strängen om det är denna spelares tur</param>
+        /// <param name="spelare2">Skriver ut strängen om det är denna spelares tur</param>
+        static void skrivUtVemsDrag(ref int antalDrag, string spelare1, string spelare2)
+        {
+            if (antalDrag % 2 == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("\n" + spelare1 + " utför nästa drag.");
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("\n" + spelare2 + " utför nästa drag.");
+            }
+
+        }
+
+        /// <summary>
+        /// Skriver ut högarna med stickor som finns kvar att plocka
+        /// </summary>
+        /// <param name="array">Array med högar av stickor</param>
+        static void skrivUtStickor(int[] stickArray)
+        {
+            if (stickorKvar(stickArray))
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("\nHögarna ser nu ut såhär:");
+                for (int i = 0; i < stickArray.Length; i++)
+                {
+                    for (int j = 0; j < stickArray[i]; j++)
+                    {
+                        Console.Write("|");
+                    }
+                    Console.Write("\n");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Beräknar om det finns stickor kvar eller inte
+        /// </summary>
+        /// <param name="stickArray">Array med högar av stickor</param>
+        /// <returns>True om det finns stickor kvar, annars false</returns>
+        static bool stickorKvar(int[] stickArray)
+        {
+            bool stickorKvar = true;
+            int sum = 0;
+
+            for(int i = 0; i < stickArray.Length; i++)
+            {
+                sum += stickArray[i];
+            }
+
+            if (sum == 0)
+                stickorKvar = false;
+
+            return stickorKvar;
+        }
+
+        /// <summary>
+        /// Läser in ett drag från spelaren och beräknar därefter den nya ordningen av stickor i högarna
+        /// </summary>
+        /// <param name="antalDrag">Håller räkningen över antalet drag, ökar med 1 efter varje drag</param>
+        /// <param name="stickArray">Array med högar av stickor</param>
+        static void hanteraDrag(ref int antalDrag, int[] stickArray)
+        {
+            string dragString = "";
+
+            bool korrektInput = false;
+            while (!korrektInput)
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Ange ditt drag i formatet <hög> <antal>.");
+                dragString = Console.ReadLine();
+
+                //Felhantering
+                if (dragString.Length == 3)
+                {
+                    if (dragString[1] == ' ')
+                    {
+                        if(int.TryParse(Char.ToString(dragString[0]), out int hog_try)
+                        && int.TryParse(Char.ToString(dragString[2]), out int antal_try))
+                        {
+                            if ((hog_try == 1 && antal_try <= stickArray[0] && antal_try > 0)
+                             || (hog_try == 2 && antal_try <= stickArray[1] && antal_try > 0)
+                             || (hog_try == 3 && antal_try <= stickArray[2] && antal_try > 0))
+                            {
+                                 korrektInput = true;
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Red;
+                                Console.WriteLine("Felaktigt drag, vänligen försök igen.");
+                            }
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine("Felaktigt drag, vänligen försök igen.");
+                        }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Felaktigt drag, vänligen försök igen.");
+                    }
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Felaktigt drag, vänligen försök igen.");
+                }
+            }
+
+            int[] dragIntArray = Array.ConvertAll((dragString.Split(' ')), int.Parse);
+
+            int hog = dragIntArray[0] - 1;
+            int antal = dragIntArray[1];
+
+            stickArray[hog] = stickArray[hog] - antal;
+
+            antalDrag++;
+        }
+
+        /// <summary>
+        /// AI som genererar ett slumpmässigt drag och beräknar därefter den nya ordningen av stickor i högarna
+        /// </summary>
+        /// <param name="antalDrag">Håller räkningen över antalet drag, ökar med 1 efter varje drag</param>
+        /// <param name="stickArray">Array med högar av stickor</param>
+        static void hanteraDrag_ai(ref int antalDrag, int[] stickArray)
+        {
+            int hog, antal, temp;
+            Random random = new Random();
+
+            if (stickArray[0] > 0 && stickArray[1] > 0 && stickArray[2] > 0)
+            {
+                hog = random.Next(0, 3);
+                antal = random.Next(1, stickArray[hog] + 1);
+            }
+
+            else if (stickArray[0] == 0 && stickArray[1] > 0 && stickArray[2] > 0)
+            {
+                hog = random.Next(1, 3);
+                antal = random.Next(1, stickArray[hog] + 1);
+            }
+
+            else if (stickArray[0] == 0 && stickArray[1] == 0 && stickArray[2] > 0)
+            {
+                hog = 2;
+                antal = stickArray[hog];
+            }
+
+            else if (stickArray[0] > 0 && stickArray[1] == 0 && stickArray[2] > 0)
+            {
+                temp = random.Next(0, 2);
+
+                if (temp == 1)
+                {
+                    hog = 0;
+                }
+                else
+                {
+                    hog = 2;
+                }
+
+                antal = random.Next(1, stickArray[hog] + 1);
+            }
+
+            else if (stickArray[0] > 0 && stickArray[1] == 0 && stickArray[2] == 0)
+            {
+                hog = 0;
+                antal = stickArray[hog];
+            }
+
+            else if (stickArray[0] > 0 && stickArray[1] > 0 && stickArray[2] == 0)
+            {
+                hog = random.Next(0, 2);
+                antal = random.Next(1, stickArray[hog] + 1);
+            }
+
+            else
+            {
+                hog = 1;
+                antal = stickArray[hog];
+            }
+
+            stickArray[hog] = stickArray[hog] - antal;
+
+            antalDrag++;
+        }
+    }
+}
